@@ -34,6 +34,7 @@ import org.apache.camel.k.support.PropertiesSupport;
 import org.apache.camel.main.BaseMainSupport;
 import org.apache.camel.main.MainSupport;
 import org.apache.camel.main.RoutesCollector;
+import org.apache.camel.model.RouteTemplatesDefinition;
 import org.apache.camel.model.RoutesDefinition;
 import org.apache.camel.model.rest.RestsDefinition;
 import org.apache.camel.spi.HasId;
@@ -202,14 +203,13 @@ public final class ApplicationRuntime implements Runtime {
         @Override
         protected void doStart() throws Exception {
             super.doStart();
-            if (getCamelContext() != null) {
-                try {
-                    // if we were veto started then mark as completed
-                    getCamelContext().start();
-                } finally {
-                    if (getCamelContext().isVetoStarted()) {
-                        completed();
-                    }
+
+            try {
+                // if we were veto started then mark as completed
+                getCamelContext().start();
+            } finally {
+                if (getCamelContext().isVetoStarted()) {
+                    completed();
                 }
             }
         }
@@ -217,18 +217,12 @@ public final class ApplicationRuntime implements Runtime {
         @Override
         protected void doStop() throws Exception {
             super.doStop();
-            if (getCamelContext() != null) {
-                getCamelContext().stop();
-            }
+            getCamelContext().stop();
         }
 
         @Override
         protected ProducerTemplate findOrCreateCamelTemplate() {
-            if (getCamelContext() != null) {
-                return getCamelContext().createProducerTemplate();
-            } else {
-                return null;
-            }
+            return getCamelContext().createProducerTemplate();
         }
     }
 
@@ -240,6 +234,11 @@ public final class ApplicationRuntime implements Runtime {
 
         @Override
         public List<RoutesDefinition> collectXmlRoutesFromDirectory(CamelContext camelContext, String directory) throws Exception {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public List<RouteTemplatesDefinition> collectXmlRouteTemplatesFromDirectory(CamelContext camelContext, String directory) throws Exception {
             return Collections.emptyList();
         }
 
