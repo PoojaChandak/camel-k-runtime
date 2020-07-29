@@ -58,7 +58,7 @@ public class KameletTest {
             public void configure() throws Exception {
                 // routes
                 from("direct:template")
-                    .to("kamelet:setBody/test?bodyValue=bv")
+                    .toF("kamelet:setBody/test?bodyValue=%s", body)
                     .to("log:1");
             }
         });

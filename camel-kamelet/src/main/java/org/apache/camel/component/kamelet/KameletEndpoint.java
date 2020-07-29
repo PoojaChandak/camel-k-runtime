@@ -16,6 +16,8 @@
  */
 package org.apache.camel.component.kamelet;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.AsyncCallback;
@@ -25,12 +27,18 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
+import org.apache.camel.impl.event.CamelContextInitializedEvent;
+import org.apache.camel.model.ModelCamelContext;
+import org.apache.camel.model.RouteDefinition;
+import org.apache.camel.spi.CamelEvent;
+import org.apache.camel.spi.EventNotifier;
 import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriPath;
 import org.apache.camel.support.DefaultAsyncProducer;
 import org.apache.camel.support.DefaultConsumer;
 import org.apache.camel.support.DefaultEndpoint;
+import org.apache.camel.support.EventNotifierSupport;
 import org.apache.camel.support.service.ServiceHelper;
 
 @UriEndpoint(
@@ -87,16 +95,29 @@ public class KameletEndpoint extends DefaultEndpoint {
     }
 
     @Override
-    protected void doStart() throws Exception {
-        try {
-            // Add a route to the camel context from the given template
-            // TODO: add validation (requires: https://issues.apache.org/jira/browse/CAMEL-15312)
-            getCamelContext().addRouteFromTemplate(routeId, templateId, kameletProperties);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
+    protected void doInit() throws Exception {
+        super.doInit();
 
-        super.doStart();
+        // TODO: lets find a nicer way to do this
+        EventNotifier notifier = new EventNotifierSupport() {
+            @Override
+            public void notify(CamelEvent event) throws Exception {
+                String id = getCamelContext().addRouteFromTemplate(routeId, templateId, kameletProperties);
+                List<RouteDefinition> list = new ArrayList<>(1);
+                list.add(getCamelContext().adapt(ModelCamelContext.class).getRouteDefinition(id));
+                getCamelContext().adapt(ModelCamelContext.class).startRouteDefinitions(list);
+                // no longer needed so we can remove ourselves
+                getCamelContext().getManagementStrategy().removeEventNotifier(this);
+            }
+
+            @Override
+            public boolean isEnabled(CamelEvent event) {
+                return event instanceof CamelContextInitializedEvent;
+            }
+        };
+
+        ServiceHelper.startService(notifier);
+        getCamelContext().getManagementStrategy().addEventNotifier(notifier);
     }
 
     // *********************************

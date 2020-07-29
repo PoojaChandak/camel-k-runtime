@@ -42,7 +42,7 @@ public class KameletComponent extends DefaultComponent {
 
         //
         // The properties for the kamelets are determined by global properties
-        // and local endpoint parametes,
+        // and local endpoint parameters,
         //
         // Global parameters are loaded in the following order:
         //
