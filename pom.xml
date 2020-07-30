@@ -38,7 +38,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
 
-        <camel.version>3.4.0</camel.version>
+        <camel.version>3.5.0-SNAPSHOT</camel.version>
         <camel-quarkus.version>1.0.0-CR3</camel-quarkus.version>
         <catalog.version>${camel.version}</catalog.version>
         <junit.version>5.6.2</junit.version>
@@ -236,6 +236,7 @@
         <module>tooling</module>
 
         <module>camel-knative</module>
+        <module>camel-kamelet</module>
 
         <module>camel-k-runtime-core</module>
         <module>camel-k-main</module>
@@ -335,6 +336,11 @@
             <dependency>
                 <groupId>org.apache.camel.k</groupId>
                 <artifactId>camel-knative-http</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel.k</groupId>
+                <artifactId>camel-kamelet</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
