@@ -43,8 +43,10 @@ public class KameletComponent extends DefaultComponent {
         super(context);
     }
 
-    private volatile RouteTemplateEventNotifier notifier;
+    // use as temporary to keep track of created kamelet endpoints during startup as we need to defer
+    // create routes from templates until camel context has finished loading all routes and whatnot
     private final List<KameletEndpoint> endpoints = new ArrayList<>();
+    private volatile RouteTemplateEventNotifier notifier;
 
     @Override
     protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
